@@ -46,8 +46,18 @@ define gitlab_ci_runner::runner (
         onlyif  => "/bin/grep \'\"${runner_name}\"\' ${toml_file}",
       }
     } else {
-      # Execute gitlab ci multirunner register
-      exec {"Register_runner_${title}":
+      # Record current config, on reconfigure unregister first
+      # so new config gets registered
+      file{"${gitlab_ci_runner::runner_config_tmp_dir}/${runner_name}":
+        content => $parameters_string,
+        owner   => root,
+        group   => root,
+        mode    => '0600',
+      } ~> exec {"Unregister_runner_${title}":
+        refreshonly => true,
+        command     => "/usr/bin/${binary} unregister -n ${title}",
+        onlyif      => "/bin/grep \'\"${runner_name}\"\' ${toml_file}",
+      } -> exec {"Register_runner_${title}":
         command => "/usr/bin/${binary} register -n ${parameters_string}",
         unless  => "/bin/grep \'\"${runner_name}\"\' ${toml_file}",
       }

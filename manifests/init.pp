@@ -148,6 +148,15 @@ class gitlab_ci_runner (
     }
   }
 
+  $runner_config_tmp_dir = "${facts['puppet_vardir']}/runner_configs"
+  file{
+    $runner_config_tmp_dir:
+      ensure => directory,
+      owner  => root,
+      group  => root,
+      mode   => '0640',
+  }
+
   exec { 'gitlab-runner-restart':
     command     => "/usr/bin/${package_name} restart",
     refreshonly => true,
