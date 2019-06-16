@@ -151,10 +151,13 @@ class gitlab_ci_runner (
   $runner_config_tmp_dir = "${facts['puppet_vardir']}/runner_configs"
   file{
     $runner_config_tmp_dir:
-      ensure => directory,
-      owner  => root,
-      group  => root,
-      mode   => '0640',
+      ensure  => directory,
+      owner   => root,
+      group   => root,
+      mode    => '0640',
+      purge   => true,
+      force   => true,
+      recurse => true,
   }
 
   exec { 'gitlab-runner-restart':
